@@ -1,0 +1,305 @@
+<template>
+  <div class="addEdit-block">
+    <el-form
+      class="detail-form-content"
+      ref="ruleForm"
+      :model="ruleForm"
+      :rules="rules"
+      label-width="80px"
+    >
+      <el-row >
+      <el-col :span="12">
+        <el-form-item class="input" v-if="type!='info'"  label="用户名" prop="yonghuming">
+          <el-input v-model="ruleForm.yonghuming" 
+              placeholder="用户名" clearable  :readonly="ro.yonghuming"></el-input>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="用户名" prop="yonghuming">
+              <el-input v-model="ruleForm.yonghuming" 
+                placeholder="用户名" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="input" v-if="type!='info'"  label="姓名" prop="xingming">
+          <el-input v-model="ruleForm.xingming" 
+              placeholder="姓名" clearable  :readonly="ro.xingming"></el-input>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="姓名" prop="xingming">
+              <el-input v-model="ruleForm.xingming" 
+                placeholder="姓名" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="24">  
+        <el-form-item class="upload" v-if="type!='info' && !ro.touxiang" label="头像" prop="touxiang">
+          <file-upload
+          tip="点击上传头像"
+          action="file/upload"
+          :limit="3"
+          :multiple="true"
+          :fileUrls="ruleForm.touxiang?ruleForm.touxiang:''"
+          @change="touxiangUploadChange"
+          ></file-upload>
+        </el-form-item>
+        <div v-else>
+          <el-form-item v-if="ruleForm.touxiang" label="头像" prop="touxiang">
+            <img style="margin-right:20px;" v-bind:key="index" v-for="(item,index) in ruleForm.touxiang.split(',')" :src="$base.url+item" width="100" height="100">
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="input" v-if="type!='info'"  label="密码" prop="mima">
+          <el-input v-model="ruleForm.mima" 
+              placeholder="密码" clearable  :readonly="ro.mima"></el-input>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="密码" prop="mima">
+              <el-input v-model="ruleForm.mima" 
+                placeholder="密码" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="input" v-if="type!='info'"  label="手机" prop="shouji">
+          <el-input v-model="ruleForm.shouji" 
+              placeholder="手机" clearable  :readonly="ro.shouji"></el-input>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="手机" prop="shouji">
+              <el-input v-model="ruleForm.shouji" 
+                placeholder="手机" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      </el-row>
+      <el-form-item class="btn">
+        <el-button  v-if="type!='info'" type="primary" class="btn-success" @click="onSubmit">提交</el-button>
+        <el-button v-if="type!='info'" class="btn-close" @click="back()">取消</el-button>
+        <el-button v-if="type=='info'" class="btn-close" @click="back()">返回</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+<script>
+// 手机校验
+import { isMobile } from "@/utils/validate";
+export default {
+  data() {
+    var validateMobile = (rule, value, callback) => {
+      if(!value){
+        callback();
+      } else if (!isMobile(value)) {
+        callback(new Error("请输入正确的手机号码"));
+      } else {
+        callback();
+      }
+    };
+    return {
+	  addEditForm: {"btnSaveFontColor":"rgba(0, 0, 0, 1)","selectFontSize":"16px","btnCancelBorderColor":"rgba(188, 188, 188, 1)","inputBorderRadius":"0","inputFontSize":"16px","textareaBgColor":"#fff","btnSaveFontSize":"14px","textareaBorderRadius":"0","uploadBgColor":"#fff","textareaBorderStyle":"solid","btnCancelWidth":"88px","textareaHeight":"120px","dateBgColor":"#fff","btnSaveBorderRadius":"0","uploadLableFontSize":"14px","textareaBorderWidth":"1px","inputLableColor":"rgba(0, 0, 0, 1)","addEditBoxColor":"#fff","dateIconFontSize":"16px","btnSaveBgColor":"rgba(219, 244, 255, 1)","uploadIconFontColor":"rgba(0, 0, 0, 1)","textareaBorderColor":"rgba(112, 112, 112, 1)","btnCancelBgColor":"rgba(241, 241, 241, 1)","selectLableColor":"rgba(0, 0, 0, 1)","btnSaveBorderStyle":"solid","dateBorderWidth":"1px","dateLableFontSize":"14px","dateBorderRadius":"0","btnCancelBorderStyle":"solid","selectLableFontSize":"14px","selectBorderStyle":"solid","selectIconFontColor":"rgba(0, 0, 0, 1)","btnCancelHeight":"44px","inputHeight":"40px","btnCancelFontColor":"rgba(0, 0, 0, 1)","dateBorderColor":"rgba(112, 112, 112, 1)","dateIconFontColor":"rgba(0, 0, 0, 1)","uploadBorderStyle":"solid","dateBorderStyle":"solid","dateLableColor":"rgba(0, 0, 0, 1)","dateFontSize":"16px","inputBorderWidth":"1px","uploadIconFontSize":"28px","selectHeight":"40px","inputFontColor":"rgba(0, 0, 0, 1)","uploadHeight":"148px","textareaLableColor":"rgba(0, 0, 0, 1)","textareaLableFontSize":"14px","btnCancelFontSize":"14px","inputBorderStyle":"solid","btnCancelBorderRadius":"0","inputBgColor":"#fff","inputLableFontSize":"14px","uploadLableColor":"rgba(0, 0, 0, 1)","uploadBorderRadius":"0","btnSaveHeight":"44px","selectBgColor":"#fff","btnSaveWidth":"88px","selectIconFontSize":"16px","dateHeight":"40px","selectBorderColor":"rgba(112, 112, 112, 1)","inputBorderColor":"rgba(112, 112, 112, 1)","uploadBorderColor":"rgba(112, 112, 112, 1)","textareaFontColor":"rgba(0, 0, 0, 1)","selectBorderWidth":"1px","dateFontColor":"#606266","btnCancelBorderWidth":"0 5px 5px","uploadBorderWidth":"1px","textareaFontSize":"16px","selectBorderRadius":"0","selectFontColor":"rgba(0, 0, 0, 1)","btnSaveBorderColor":"rgba(109, 109, 148, 1)","btnSaveBorderWidth":"0 5px 5px"},
+      id: '',
+      type: '',
+      ro:{
+        yonghuming : false,
+        xingming : false,
+        touxiang : false,
+        mima : false,
+        shouji : false,
+      },
+      ruleForm: {
+        yonghuming: '',
+        xingming: '',
+        touxiang: '',
+        mima: '',
+        shouji: '',
+      },
+      rules: {
+          yonghuming: [
+                { required: true, message: '用户名不能为空', trigger: 'blur' },
+          ],
+          xingming: [
+                { required: true, message: '姓名不能为空', trigger: 'blur' },
+          ],
+          mima: [
+                { required: true, message: '密码不能为空', trigger: 'blur' },
+          ],
+          shouji: [
+                { validator: validateMobile, trigger: 'blur' },
+          ],
+      }
+    };
+  },
+  props: ["parent"],
+  created() {
+    this.addEditStyleChange()
+  },
+  methods: {
+    // 初始化
+    init(id,type) {
+      if (id) {
+        this.id = id;
+        this.type = type;
+      }
+      if(this.type=='info'||this.type=='else'){
+        this.info(id);
+      }
+      // 获取用户信息
+      this.$http({
+        url: `${this.$storage.get('sessionTable')}/session`,
+        method: "get"
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          console.log(data);
+        } else {
+          this.$message.error(data.msg);
+        }
+      });
+    },
+    // 多级联动参数
+    info(id) {
+      this.$http({
+        url: `yonghu/info/${id}`,
+        method: "get"
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+        this.ruleForm = data.data;
+        //解决前台上传图片后台不显示的问题
+        let reg=new RegExp('../../../upload','g')//g代表全部
+        } else {
+          this.$message.error(data.msg);
+        }
+      });
+    },
+    // 提交
+    onSubmit() {
+      if(this.ruleForm.touxiang!=null) {
+        this.ruleForm.touxiang = this.ruleForm.touxiang.replace(new RegExp(this.$base.url,"g"),"");
+      }
+       this.$refs["ruleForm"].validate(valid => {
+         if (valid) {
+            this.$http({
+              url: `yonghu/${!this.ruleForm.id ? "save" : "update"}`,
+              method: "post",
+              data: this.ruleForm
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.parent.showFlag = true;
+                    this.parent.addOrUpdateFlag = false;
+                    this.parent.yonghuCrossAddOrUpdateFlag = false;
+                    this.parent.search();
+                    this.parent.contentStyleChange();
+                  }
+                });
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+         }
+       });
+    },
+    // 获取uuid
+    getUUID () {
+      return new Date().getTime();
+    },
+    // 返回
+    back() {
+      this.parent.showFlag = true;
+      this.parent.addOrUpdateFlag = false;
+      this.parent.contentStyleChange();
+    },
+    touxiangUploadChange(fileUrls) {
+	this.ruleForm.touxiang = fileUrls;
+	this.addEditUploadStyleChange()
+    },
+	addEditStyleChange() {
+	  this.$nextTick(()=>{
+	    // input
+	    document.querySelectorAll('.addEdit-block .input .el-input__inner').forEach(el=>{
+	      el.style.height = "40px"
+	    })
+	    document.querySelectorAll('.addEdit-block .input .el-form-item__label').forEach(el=>{
+	      el.style.lineHeight = "40px"
+	    })
+	    // select 下拉栏
+	    document.querySelectorAll('.addEdit-block .select .el-input__inner').forEach(el=>{
+	      el.style.height = "40px"
+	    })
+	    document.querySelectorAll('.addEdit-block .select .el-form-item__label').forEach(el=>{
+	      el.style.lineHeight = "40px"
+	    })
+	    // date
+	    document.querySelectorAll('.addEdit-block .date .el-input__inner').forEach(el=>{
+	      el.style.height = "40px"
+	    })
+	    document.querySelectorAll('.addEdit-block .date .el-form-item__label').forEach(el=>{
+	      el.style.lineHeight = "40px"
+	    })
+	    document.querySelectorAll('.addEdit-block .date .el-input__icon').forEach(el=>{
+	      el.style.lineHeight = "40px"
+	    })
+	    // upload
+	    document.querySelectorAll('.addEdit-block .upload .el-upload--picture-card').forEach(el=>{
+	      el.style.width = "148px"
+	      el.style.height = "148px"
+	      el.style.borderColor = "rgba(112, 112, 112, 1)"
+	      el.style.backgroundColor = "#fff"
+	    })
+	    document.querySelectorAll('.addEdit-block .upload .el-form-item__label').forEach(el=>{
+	      el.style.lineHeight = "148px"
+	    })
+	    document.querySelectorAll('.addEdit-block .upload .el-icon-plus').forEach(el=>{
+	      el.style.fontSize = "28px"
+	      el.style.lineHeight = '146px'
+	      el.style.display = 'block'
+	    })
+	    // 多文本输入框
+	    document.querySelectorAll('.addEdit-block .textarea .el-textarea__inner').forEach(el=>{
+	      el.style.height = "120px"
+	    })
+	    // 保存
+	    document.querySelectorAll('.addEdit-block .btn .btn-success').forEach(el=>{
+	      el.style.width = "88px"
+	      el.style.height = "44px"
+	    })
+	    // 返回
+	    document.querySelectorAll('.addEdit-block .btn .btn-close').forEach(el=>{
+	      el.style.width = "88px"
+	      el.style.height = "44px"
+	    })
+	  })
+	},
+  }
+};
+</script>
+<style lang="scss">
+.editor{
+  height: 500px;
+  
+  & /deep/ .ql-container {
+	  height: 310px;
+  }
+}
+.amap-wrapper {
+  width: 100%;
+  height: 500px;
+}
+.search-box {
+  position: absolute;
+}
+.addEdit-block {
+	margin: -10px;
+}
+.detail-form-content {
+	padding: 12px;
+	background-color: transparent;
+}
+.btn .el-button {
+  padding: 0;
+}
+</style>

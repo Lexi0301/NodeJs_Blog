@@ -1,0 +1,14 @@
+{
+	"port": 8080,
+	"bodyLimit": "100000kb",
+	"corsHeaders": ["Link"],
+	"projectName": "nodejslexi",
+	"dbConnection": {
+		"dbtype": "mysql",
+		"database": "nodejslexi",
+		"username": "root",
+		"password": "root"
+	},
+	"sessionSecret": "jiahui",
+	"jwtSecret": "jiahui"
+}

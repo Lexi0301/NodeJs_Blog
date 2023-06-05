@@ -1,0 +1,227 @@
+<!-- 收藏 -->
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>收藏</title>
+	<link rel="stylesheet" href="../../layui/css/layui.css">
+	<!-- 样式 -->
+	<link rel="stylesheet" href="../../css/style.css" />
+	<!-- 通用的css -->
+	<link rel="stylesheet" href="../../css/common.css" />
+</head>
+<style>
+
+	.index-title {
+		width: 80%;
+		margin: 60px auto 30px;
+		padding: 20px 10px;
+		display: flex;
+		background-color: #f56c6c;
+		box-shadow: 0px 0px 8px 0px #f56c6c !important;
+		border-radius: 10px !important;
+		color: #fff;
+		justify-content: center;
+	}
+
+	.layui-laypage .layui-laypage-count {
+		padding: 0 10px;
+	}
+
+	.layui-laypage .layui-laypage-skip {
+		padding-left: 10px;
+	}
+	
+	.data-container {
+		height: 1000px;
+	}
+	.search-container{
+		padding: 10px 10px;
+		width: 80%;
+		display: flex;
+		justify-content: right;
+		box-shadow: 0px 0px 8px 0px #f56c6c !important;
+        border-radius: 10px !important;
+	}
+	.data-list{
+		box-shadow: 0px 0px 8px 0px #f56c6c !important;
+        border-radius: 10px !important;
+		width: 80%;
+		margin: 30px auto;
+		padding: 10px 10px;
+	}
+</style>
+
+<body>
+
+	<div id="app">
+		<!-- 标题 -->
+		<div class="index-title"
+			:style='{"borderWidth":"0","fontSize":"20px","borderStyle":"solid","height":"auto"}'>
+			<span>我的收藏</span>
+		</div>
+		<!-- 标题 -->
+
+		<!-- 图文列表 -->
+		<div class="data-container layui-row">
+			<fieldset class="search-container">
+				<form class="layui-form">
+					<div class="layui-inline" :style='{"padding":"0 10px","margin":"0","backgroundColor":"transparent","color":"rgba(0, 0, 0, 1)","textAlign":"right","borderWidth":"0","width":"auto","fontSize":"16px","borderStyle":"solid"}'>
+						<label class="layui-form-label">名称</label>
+						<div class="layui-input-inline">
+							<input type="text" name="name" id="name" placeholder="名称" autocomplete="off"
+							:style='{"borderColor":"#ccc","backgroundColor":"rgba(233, 233, 233, 1)","color":"#333","borderRadius":"8px","textAlign":"center","borderWidth":"0","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}'
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<button id="btn-search" type="button" class="layui-btn" :style='{"padding":"0 15px","margin":"0 30px 0 10px","borderColor":"#409EFF","backgroundColor":"#f56c6c","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"100px","fontSize":"14px","borderStyle":"solid","height":"40px"}'>
+							<i class="layui-icon layui-icon-search"></i> 搜索
+						</button>
+					</div>
+				</form>
+			</fieldset>
+			<div class="data-list layui-col-md8 layui-col-md-offset2">
+				<div @click="jump('../'+item.tablename+'/detail.html?id='+item.refid)" v-for="(item,index) in dataList"
+					v-bind:key="index" class="data-item layui-col-md3">
+					<img class="cover" :src="baseurl+item.picture.split(',')[0]">
+					<h3 class="title">{{item.name}}</h3>
+				</div>
+			</div>
+			<div class="pager" id="pager" :style="{textAlign:2==1?'left':2==2?'center':'right'}"></div>
+		</div>
+		<!-- 图文列表 -->
+	</div>
+
+
+	<!-- layui -->
+	<script src="../../layui/layui.js"></script>
+	<!-- vue -->
+	<script src="../../js/vue.js"></script>
+	<!-- 组件配置信息 -->
+	<script src="../../js/config.js"></script>
+	<!-- 扩展插件配置信息 -->
+	<script src="../../modules/config.js"></script>
+	<!-- 工具方法 -->
+	<script src="../../js/utils.js"></script>
+	<script>
+		var vue = new Vue({
+			el: '#app',
+			data: {
+				dataList: [],
+				baseurl: ''
+			},
+			filters: {
+				newsDesc: function (val) {
+					if (val) {
+						if (val.length > 200) {
+							return val.substring(0, 200).replace(/<[^>]*>/g).replace(/undefined/g, '');
+						} else {
+							return val.replace(/<[^>]*>/g).replace(/undefined/g, '');
+						}
+					}
+					return '';
+				}
+			},
+			methods: {
+				jump(url) {
+					jump(url)
+				}
+			}
+		})
+
+		layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery'], function () {
+			var layer = layui.layer;
+			var element = layui.element;
+			var carousel = layui.carousel;
+			var laypage = layui.laypage;
+			var http = layui.http;
+			var jquery = layui.jquery;
+
+			var limit = 8;
+
+			vue.baseurl = http.baseurl;
+			// 获取轮播图 数据
+			http.request('config/list', 'get', {
+				page: 1,
+				limit: 5
+			}, );
+			// 分页列表
+			pageList();
+
+			// 搜索按钮
+			jquery('#btn-search').click(function (e) {
+				pageList();
+			});
+
+
+			function pageList() {
+				// 获取列表数据
+				http.request('storeup/list', 'get', {
+					page: 1,
+					limit: limit,
+					type: 1,
+					userid: localStorage.getItem('userid')
+				}, function (res) {
+					vue.dataList = res.data.list
+					// 分页
+					laypage.render({
+						elem: 'pager',
+						count: res.data.total,
+						limit: limit,
+						groups: 5,
+						layout: ["prev", "page", "next"],
+						theme: '#f56c6c',
+						jump: function (obj, first) {
+							//首次不执行
+							if (!first) {
+								http.request('news/list', 'get', {
+									page: obj.curr,
+									limit: obj.limit
+								}, function (res) {
+									vue.dataList = res.data.list
+								})
+							}
+						}
+					});
+				});
+			}
+			function pageList() {
+				var param = {
+					page: 1,
+					limit: limit,
+					type: 1,
+					userid: localStorage.getItem('userid')
+				}
+				if (jquery('#name').val()) {
+					param['name'] = jquery('#name').val() ? '%' + jquery('#name').val() + '%' : '';
+				}
+				// 获取列表数据
+				http.request('storeup/list', 'get', param, function (res) {
+					vue.dataList = res.data.list
+					// 分页
+					laypage.render({
+						elem: 'pager',
+						count: res.data.total,
+						limit: limit,
+						groups: 5,
+						layout: ["prev", "page", "next"],
+						theme: '#f56c6c',
+						jump: function (obj, first) {
+							//首次不执行
+							if (!first) {
+								http.request('storeup/list', 'get', param, function (res) {
+									vue.dataList = res.data.list
+								})
+							}
+						}
+					});
+				})
+			}
+		});
+	</script>
+</body>
+
+</html>
